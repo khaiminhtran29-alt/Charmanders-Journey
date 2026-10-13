@@ -27,6 +27,8 @@ public class CharmanderJourney
       frame.pack();
       frame.setVisible(true);
       
+      
+      
   
    }
    
