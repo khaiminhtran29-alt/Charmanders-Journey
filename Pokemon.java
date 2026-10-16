@@ -1,6 +1,9 @@
 /**
+ * 
+ */
 
-*/
-import 
 
-public c
+public class Pokemon
+{
+
+}
