@@ -2,39 +2,20 @@
 
 */
 
-import javax.swing.*;
-import java.awt.Dimension;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-public class CharmanderJourney
-{
-   private JFrame frame;
-   private GamePanel gp;
-   
-   public CharmanderJourney ()
-   {
-      //Create the window that containes the game
-      frame = new JFrame("Title: Charmander's Journey");
-      
-      //Config the frame
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setLocationRelativeTo(null);
-      
-      //Add GamePanel to Frame
-      gp = new GamePanel();
-      //gp.setPreferredSize(new Dimension (600, 600));
-      frame.setContentPane(gp);
-      
-      frame.pack();
-      frame.setVisible(true);
-      
-      
-      
-  
-   }
-   
-   public static void main (String[] args)
-   {
-      CharmanderJourney game = new CharmanderJourney();
-      
-   }
+
+public class CharmanderJourney {
+
+    public static void main(String[] args) {
+        
+            JFrame frame = new JFrame("Charmander's Journey");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(new GamePanel());
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        
+    }
 }
