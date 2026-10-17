@@ -7,7 +7,7 @@ import java.awt.*;
 public class GamePanel extends JPanel
 {
    private static final int GAP = 8;
-   private static final int MAX_PROGRESS = 100;
+   private static final int MAX_PROGRESS = Pokemon.MAX_LVL * 6;
    
    private final JProgressBar progressBar;
    
@@ -22,10 +22,11 @@ public class GamePanel extends JPanel
       add(progressBar, BorderLayout.NORTH);
       
       // Each panel reports progress through addProgress
-      CatchPanel catchPanel = new CatchPanel(this::addProgress);
       BattlePanel battlePanel = new BattlePanel(this::addProgress);
+      CatchPanel catchPanel = new CatchPanel(battlePanel::addPokemon);
       
-      JPanel playArea = new JPanel(new GridLayout(1, 2, GAP, 0));
+      JPanel playArea = new JPanel();
+      playArea.setLayout(new BoxLayout(playArea, BoxLayout.X_AXIS));
       playArea.add(catchPanel);
       playArea.add(battlePanel);
       
@@ -39,6 +40,7 @@ public class GamePanel extends JPanel
    }
    
    private void updateProgressText() {
-      progressBar.setString("Journey: " + progressBar.getValue() + "%");
+      String progress = String.format("Journey: %.2f%%", progressBar.getPercentComplete() * 100);
+      progressBar.setString(progress);
    }
 }

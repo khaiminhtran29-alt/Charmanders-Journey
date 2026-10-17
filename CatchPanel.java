@@ -7,120 +7,131 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
-import java.util.function.IntConsumer;
+import java.util.function.Consumer;
 
 public class CatchPanel extends JPanel
 {
    private static final int STARTING_POKEBALLS = 5;
-   private static final int CATCH_CHANCE_PERCENT = 50;
-   private static final int CATCH_PROGRESS = 10;
+   private static final double CATCH_CHANCE_PERCENT = .5;
+   private static final int SWITCH_DELAY = 3000;
 
-   private final JLabel ballsLabel;
+   private final JLabel pokemonLevelLabel;
+   private final JLabel pokemonImageLabel;
    private final JLabel statusLabel;
    private final JButton catchButton;
-   private final Random random = new Random();
+   private final JLabel ballsLabel;
+   private final JLabel catchLabel;
+
+   private final Timer switchTimer;
 
    private int pokeballs = STARTING_POKEBALLS;
-   private boolean pokemonCaught = false;
+   private Pokemon currentPokemon;
 
-   public CatchPanel(IntConsumer onProgress) {   
+   public CatchPanel(Consumer<Pokemon> addPokemon) {   
+      // Configure layout
       setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
       setBorder(BorderFactory.createTitledBorder("Catch a Pokémon"));
-      
-      JLabel levelLabel = new JLabel("Wild Pokémon - Level 3");
-      levelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-      
-      JLabel imageLabel =  createPokemonImageLabel();
-      imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-      
+
+      // Generate current pokemon
+      currentPokemon = Pokemon.generateRandomPokemon();
+
+      // Instantiate components
+      pokemonLevelLabel = new JLabel();
+      pokemonImageLabel = new JLabel();
+      statusLabel = new JLabel();
       catchButton = new JButton("Throw Poké Ball");
-      catchButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-      catchButton.addActionListener(event -> attemptCatch(onProgress));
-      
       ballsLabel = new JLabel();
-      ballsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-      
-      statusLabel = new JLabel("A wild Pokémon appeared!");
+      catchLabel = new JLabel();
+
+      // Center components
+      pokemonLevelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+      pokemonImageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-      
-      updateBallsLabel();
-      
-      add(levelLabel);
+      catchButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+      ballsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+      catchLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+      // Set attemptCatch to run when catchButton is clicked
+      catchButton.addActionListener(event -> attemptCatch(addPokemon));
+
+      // Set switchPokemon to run every 5 seconds
+      switchTimer = new Timer(SWITCH_DELAY, event -> switchPokemon());
+      switchTimer.start();
+
+      // Update component information with current information
+      updateCatchPanel();
+
+      // Add components to the catch panel
+      add(Box.createVerticalStrut(50));
+      add(pokemonLevelLabel);
       add(Box.createVerticalStrut(8));
-      add(imageLabel);
+      add(pokemonImageLabel);
       add(Box.createVerticalStrut(8));
+      add(statusLabel);
+      add(Box.createVerticalStrut(20));
       add(catchButton);
       add(ballsLabel);
-      add(statusLabel);   
+      add(Box.createVerticalStrut(40));
+      add(catchLabel);
+      add(Box.createVerticalStrut(100));
+   }
+
+   private void attemptCatch(Consumer<Pokemon> addPokemon) 
+   {
+      // define logic
+      if (Math.random() < CATCH_CHANCE_PERCENT) {
+         // TODO: add pokemon with addPokemon method!
+         catchLabel.setText("You caught " + currentPokemon.getName() + "!");
+         pokeballs--;
+      } else {
+         catchLabel.setText("Too bad, you missed! " + currentPokemon.getName() + " got away!");
+      }
+
+      switchTimer.restart();
+      switchPokemon();
+   }
+
+   private void switchPokemon() {
+      // re-generate current pokemon 
+      currentPokemon = Pokemon.generateRandomPokemon();
+      
+      // update the catch panel with new information
+      updateCatchPanel();
    }
   
-   private static JLabel createPokemonImageLabel(String imageFileName)
-   {
+   private void updateCatchPanel()
+   {   
+      // If the user has run out of pokeballs, stop the switchTimer
+
+      // Set pokemon level label text
+
+      // Set pokemon image label image
+
+      // Set enabled status of catch button
+
+      // Set number of balls for balls label
+
+      // Set status label to say a wild [pokemon name] appeared
+
+   }
+    
+   private void updatePokemonImageLabel() {
       try 
       {
-         BufferedImage image = ImageIO.read(new File(imageFileName));
+         // Risky code-- try reading the current pokemon's image file
+         BufferedImage image = ImageIO.read(new File(currentPokemon.getImageFilename()));
          
+         // If the image is null, set the image label text to an error message
          if (image == null)
-         {
-            return new JLabel("Image could not be read");
-         }
+            pokemonImageLabel.setText("Image could not be read");
          
-         Image scaledImage = image.getScaledInstance(200,200, Image.SCALE_SMOOTH);
-         
-         return new JLabel(new ImageIcon(scaledImage));
-         
+         // If the image is valid, set the image label icon to it, scaled
+         Image scaledImage = image.getScaledInstance(-1,300, Image.SCALE_SMOOTH);
+         pokemonImageLabel.setIcon(new ImageIcon(scaledImage));
+
       } catch (IOException exception) {
-         //Keep the rest of the panel usable if the image is missing
-         
-         return new JLabel("Could not load " + imageFileName);
+         // If an exception occurs, set image label text to an error message
+         pokemonImageLabel.setText("Could not load " + currentPokemon.getImageFilename());
       }        
-   }
-  
-   private void attemptCatch(IntConsumer onProgress) 
-   {
-      if (pokemonCaught)
-      {
-         statusLabel.setText("You already caught this Pokémon.");
-         return;
-      }
-      
-      if (pokeballs <=0)
-      {
-         statusLabel.setText("You're out of Poké Balls.");
-         return;
-      }
-      
-      // A Poke Ball is used on every attempt
-      pokeballs--;
-      updateBallsLabel();
-      
-      boolean caught = random.nextInt(100) < CATCH_CHANCE_PERCENT;
-      
-      if (caught)
-      {
-         pokemonCaught = true;
-         statusLabel.setText("Caught the Pokémon!");
-         catchButton.setEnabled(false);
-         
-         // Tell GamePanel to add catch progress.
-         onProgress.accept(CATCH_PROGRESS);
-      }
-      
-      else if (pokeballs == 0)
-      {
-         statusLabel.setText("It escaped. You're out of Poké Balls!");
-      } 
-      
-      else 
-      {
-         statusLabel.setText("It escaped. Try again!");
-      }
-   }
-  
-   private void updateBallsLabel()
-   {
-      ballsLabel.setText("Poké Balls: " + pokeballs); 
-      catchButton.setEnabled(pokeballs > 0 && !pokemonCaught);
    }
 }
