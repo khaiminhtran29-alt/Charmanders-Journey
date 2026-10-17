@@ -80,7 +80,7 @@ public class CatchPanel extends JPanel
    {
       // define logic
       if (Math.random() < CATCH_CHANCE_PERCENT) {
-         // TODO: add pokemon with addPokemon method!
+         addPokemon.accept(currentPokemon);
          catchLabel.setText("You caught " + currentPokemon.getName() + "!");
          pokeballs--;
       } else {
@@ -102,16 +102,28 @@ public class CatchPanel extends JPanel
    private void updateCatchPanel()
    {   
       // If the user has run out of pokeballs, stop the switchTimer
+      if (pokeballs <= 0)
+      {
+         switchTimer.stop();
+      }
 
       // Set pokemon level label text
+      pokemonLevelLabel.setText("Level: " + currentPokemon.getLevel());
 
       // Set pokemon image label image
+      updatePokemonImageLabel();
 
       // Set enabled status of catch button
+      if (pokeballs == 0)
+         catchButton.setEnabled(false);
+      else
+         catchButton.setEnabled(true);
 
       // Set number of balls for balls label
+      ballsLabel.setText("Number of PokeBalls: " + pokeballs);
 
       // Set status label to say a wild [pokemon name] appeared
+      statusLabel.setText("Wild " + currentPokemon.getName() + " appeared!");
 
    }
     

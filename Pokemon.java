@@ -3,15 +3,16 @@
  */
 
 public class Pokemon {
-    public static final int MAX_LVL = 30;
-    private static final int MAX_START_LVL = 10;
-    private static final int MIN_START_LVL = 1;
+    public static final int MAX_LVL = 80;
+    private static final int MAX_START_LVL = 15;
+    private static final int MIN_START_LVL = 5;
 
     private PokemonType pokemonType;
     private int level;
 
     public Pokemon(PokemonType pokemonType, int level) {
-        // TODO: initialize instance variables with arguments
+        this.pokemonType = pokemonType;
+        this.level = level;
     }
 
     /**
@@ -20,20 +21,22 @@ public class Pokemon {
      * @return the number of levels that were actually added
      */
     public int addLevels(int levels) {
-        // TODO: add levels to this pokemon's levels, capping at MAX_LVL
-        // return how many levels were actualyl added
+        int oldLevel = level;
+        level = Math.min(MAX_LVL, levels + level);
+
+        return level - oldLevel;
     }
 
     public String getImageFilename() {
-        // TODO; return Pokemon's image file name
+        return pokemonType.getImageFileName();
     }
 
     public int getLevel() {
-        // TODO: return pokemon's level
+        return level;
     }
 
     public String getName() {
-        // TODO: return pokemon's name
+        return pokemonType.getPokemonName();
     }
 
     /**
@@ -50,9 +53,12 @@ public class Pokemon {
      * @return a randomly generated Pokemon
      */
     public static Pokemon generateRandomPokemon(int minLevel, int maxLevel) {
-        // TODO: generate a random pokemon type from PokemonType
-        // Generate a random level in range [minLevel, maxLevel]
-        // return the pokemon
-        // hint: PokemonType.values() returns an array of all your Pokemon types
+        PokemonType[] pokemonTypes = PokemonType.values();
+
+        int pokeTypeIndex = (int) (Math.random() * pokemonTypes.length);
+        int pokeLevel = (int) (Math.random() * (maxLevel - minLevel + 1) + minLevel);
+
+        Pokemon genRandPokemon = new Pokemon(pokemonTypes[pokeTypeIndex], pokeLevel);
+        return genRandPokemon;
     }
 }

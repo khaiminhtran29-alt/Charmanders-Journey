@@ -53,11 +53,11 @@ public enum PokemonType
 
    public String getImageFileName()
    {
-      // TODO
+      return imageFileName; 
    }
 
    public String getPokemonName()
    {
-      // TODO
+      return pokemonName;
    }
 }
