@@ -10,6 +10,19 @@ Concepts Used:
  - File reading
  - Functional Interface
 
+ Future Features
+ - Pokemon Evolutions
+ - A future Champion rematch
+ 
+
 ## What I learned
 
-Write here what you learned
+- Designing game flow: I learned to plan out the components of the game and what code will run when certain actions are taken.
+
+- Design Java Swing GUI Hierarchies: I leanred that the Java Swing library can contain child components inside of the main component.
+
+- Inheritance: I learned about when a child class extends form a parent class, it inherits all of the parent class's behaviors and data. That's how I was able to use Java Swing components without having to display all the logic.
+
+- Functional Programming(IntConsumers): I learned how to use an IntConsumers to call another method.
+
+- Enum: I learned that enum is a way to define a class with a limited set of instances.

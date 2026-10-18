@@ -11,13 +11,13 @@ import java.io.File;
 
 public class BattlePanel extends JPanel
 {
-   private static final int CHARMANDER_START_LVL = 3;
+   private static final int CHARMANDER_START_LVL = 70;
    private static final int GAP = 8;
+   private static final int OPPONENT_RANGE = 10;
 
    private final JButton battleReadyButton;
    private final JButton battleButton;
    private final JLabel battleFeedback;
-   //private final JButton battleChampion;
 
    private final JPanel playerGrid;
    private final JPanel opponentGrid;
@@ -28,6 +28,7 @@ public class BattlePanel extends JPanel
    private int numPlayerPokemon;
 
    private Pokemon[] opponentPokemons;
+   private boolean isChampion = false;
 
    public BattlePanel(IntConsumer addProgress) { 
       // Configure Layout  
@@ -80,7 +81,7 @@ public class BattlePanel extends JPanel
       battleReadyButton.addActionListener(event -> generateOpponent());
 
       // Have battleOpponent() run when battleButton clicked
-      battleButton.addActionListener(event -> battleOpponent());
+      battleButton.addActionListener(event -> onBattleButtonClicked());
 
       // Set battleButton to not enabled (only enable when battleReady has been clicked)
       battleButton.setEnabled(false);
@@ -126,6 +127,7 @@ public class BattlePanel extends JPanel
     */
    private void generateOpponent() {
       // generate the opponent's pokemons
+      isChampion = false;
       opponentPokemons = generateOpponents(numPlayerPokemon);
 
       // Update opponent's grid with their pokemon
@@ -133,6 +135,36 @@ public class BattlePanel extends JPanel
 
       // Enable battle button
       battleButton.setEnabled(true);
+   }
+
+   public void generateChampion() {
+      // generate the opponent's pokemons
+      isChampion = true;
+      opponentPokemons =  generateChampPokemons(numPlayerPokemon);
+
+      // Update opponent's grid with their pokemon
+      updateOpponentGrid(opponentPokemons);
+
+      // Enable battle button
+      battleButton.setEnabled(true);
+   }
+
+   private Pokemon[] generateChampPokemons(int numOpponents) {
+      Pokemon[] opponentPokemons = new Pokemon[numOpponents];
+
+      for (int i = 0; i < opponentPokemons.length; i++) {
+         opponentPokemons[i] = Pokemon.generateRandomPokemon(70, 80);
+      }
+
+      return opponentPokemons;
+   }
+
+   private void onBattleButtonClicked()
+   {
+      if (isChampion)
+         battleChampion();
+      else
+         battleOpponent();
    }
 
    private void battleOpponent() {
@@ -180,6 +212,47 @@ public class BattlePanel extends JPanel
 
       // Disable battle button
       battleButton.setEnabled(false);
+   }
+
+   private void battleChampion() {
+      // compare levels and count wins
+      // win = player level > opponent level
+      int wins = 0;
+      for (int i = 0; i < numPlayerPokemon; i++)
+         if (playerPokemons[i].getLevel() > opponentPokemons[i].getLevel())
+            wins++;
+      
+      // If player won > 50% of games,
+      // winners gain (player level - opponent level) levels
+      // losers gain 1 level
+      if (wins >= 6) {
+         // Tell user they won and by how much in battle feedback
+         StringBuilder results = new StringBuilder("<html>Congratulations, you won against Diantha <br><br>");
+
+         // Award levels to pokemon
+         for (int i = 0; i < numPlayerPokemon; i++) {
+            int playerLvl = playerPokemons[i].getLevel();
+            int pointsGained = Pokemon.MAX_LVL - playerLvl;
+            playerPokemons[i].addLevels(pointsGained);
+
+            addProgress.accept(pointsGained);
+            if (pointsGained > 0)
+               results.append(playerPokemons[i].getName() + " (level "
+                  + (playerPokemons[i].getLevel() - pointsGained) + ") gained " + pointsGained + " points.<br>");
+         }
+
+         // set battle feedback to display feedback
+         battleFeedback.setText(results.toString() + "</>");
+      } else {
+         // Inform user they lost
+         battleFeedback.setText("Your team lost " + wins + " to " + (numPlayerPokemon - wins));
+      }
+
+      // Update player's grid with level gain
+      updatePlayerGrid();
+
+      // Disable battle button
+      battleButton.setEnabled(false);
 
       // Disable find opponents button and enable battle champion button once reach 100%
       
@@ -189,8 +262,8 @@ public class BattlePanel extends JPanel
       Pokemon[] opponentPokemons = new Pokemon[numOpponents];
 
       for (int i = 0; i < opponentPokemons.length; i++) {
-         int minOppLvl = Math.max(1, playerPokemons[i].getLevel() - 5);
-         int maxOppLvl = Math.min(Pokemon.MAX_LVL, playerPokemons[i].getLevel() + 5);
+         int minOppLvl = Math.max(1, playerPokemons[i].getLevel() - OPPONENT_RANGE);
+         int maxOppLvl = Math.min(Pokemon.MAX_LVL, playerPokemons[i].getLevel() + OPPONENT_RANGE);
          opponentPokemons[i] = Pokemon.generateRandomPokemon(minOppLvl, maxOppLvl);
       }
 

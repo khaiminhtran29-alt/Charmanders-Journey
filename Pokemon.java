@@ -3,9 +3,9 @@
  */
 
 public class Pokemon {
-    public static final int MAX_LVL = 80;
-    private static final int MAX_START_LVL = 15;
-    private static final int MIN_START_LVL = 5;
+    public static final int MAX_LVL = 100;
+    private static final int MAX_START_LVL = 70;
+    private static final int MIN_START_LVL = 60;
 
     private PokemonType pokemonType;
     private int level;
