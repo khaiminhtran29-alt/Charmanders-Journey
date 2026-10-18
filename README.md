@@ -26,3 +26,6 @@ Concepts Used:
 - Functional Programming(IntConsumers): I learned how to use an IntConsumers to call another method.
 
 - Enum: I learned that enum is a way to define a class with a limited set of instances.
+
+## Demo Image
+![Game Demo Image](GameDemo.png) 
